@@ -1,13 +1,13 @@
 import pandas
 
-data = pandas.read_csv('stock/MSFT.csv')
-
+data = pandas.read_csv('MSFT.csv')
+print(data)
 # format data
-for x in data['Close/Last']:
-    data['Close/Last']=float(x[1:])
-  
+data['Close/Last'] = data['Close/Last'].str.replace('$', '').astype(float)
+
 print(data.info())
 
 # 5-days SMA
-data['SMA'] = data['Close/Last'].rolling(window=5).mean()
-print(data) 
+data['SMA'] = data['Close/Last'].rolling(window=5).mean().round(4)
+for i in range(20):
+    print(data['Date'].iloc[i], data['SMA'].iloc[i])
