@@ -1,4 +1,5 @@
 import pandas
+from advice import sma_risk_tips 
 
 data = pandas.read_csv('MSFT.csv')
 
@@ -33,3 +34,5 @@ data['custom_SMA']=SMA(data['Close/Last'],5)
 # test validation
 data['test_SMA'] = data['Close/Last'].rolling(window=5).mean()
 print(data)
+
+sma_risk_tips(data, 5)
