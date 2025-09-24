@@ -1,49 +1,72 @@
+from flask import Flask, Response, render_template
 import pandas as pd
 import matplotlib.pyplot as plt
+import io
+import os
+
+app = Flask(__name__)
 
 # -----------------------------
-# Select SMA window size at runtime
+# Configuration
 # -----------------------------
-window_size = int(input("Enter SMA window size (e.g., 10, 20, 30, 40, 50): "))
+WINDOW_SIZE = 20        # Default SMA window size
+CSV_FILE = "MSFT.csv"   # Path to CSV file
+LABEL_EVERY = 50        # Show SMA labels every N points
 
-# Load CSV
-df = pd.read_csv("MSFT.csv")
+# -----------------------------
+# Routes
+# -----------------------------
+@app.route("/")
+def dashboard():
+    """Render the main dashboard page from templates folder."""
+    return render_template("frontend.html")  # Flask looks inside templates automatically
 
-# Convert 'Date' to datetime
-df['Date'] = pd.to_datetime(df['Date'])
+@app.route("/plot.png")
+def plot_png():
+    """Generate and return the MSFT SMA chart as a PNG image."""
+    if not os.path.exists(CSV_FILE):
+        return Response("CSV file not found.", mimetype="text/plain")
 
-# Remove $ and convert Close price to float
-df['Close/Last'] = df['Close/Last'].replace('[\$,]', '', regex=True).astype(float)
+    # Load and process data
+    df = pd.read_csv(CSV_FILE)
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Close/Last'] = df['Close/Last'].replace('[\$,]', '', regex=True).astype(float)
 
-# Compute SMA
-df[f'SMA_{window_size}'] = df['Close/Last'].rolling(window=window_size).mean()
+    # Compute SMA
+    sma_col = f'SMA_{WINDOW_SIZE}'
+    df[sma_col] = df['Close/Last'].rolling(window=WINDOW_SIZE).mean()
 
-# Plot
-plt.figure(figsize=(10, 6))
-plt.plot(df['Date'], df['Close/Last'], linewidth=0.5, label='MSFT Close Price')
-plt.plot(df['Date'], df[f'SMA_{window_size}'], linestyle='--', linewidth=0.5, color='orange',
-         label=f'MSFT SMA {window_size} Days')
+    # Create plot
+    plt.figure(figsize=(12, 6))
+    plt.plot(df['Date'], df['Close/Last'], linewidth=1, label='MSFT Close Price')
+    plt.plot(df['Date'], df[sma_col], linestyle='--', linewidth=1.5, color='orange',
+             label=f'{WINDOW_SIZE}-Day SMA')
 
-# Label SMA values every 20 points using slicing
-every20 = df[f'SMA_{window_size}'].iloc[::50]  # every 20th point
-for idx in every20.index:
-    y = df[f'SMA_{window_size}'].iloc[idx]
-    if pd.notna(y):
-        x = df['Date'].iloc[idx]
-        plt.text(x, y + 40, f'{y:.1f}', fontsize=8, ha='center', va='bottom')
+    # Add SMA labels every LABEL_EVERY points
+    for idx in df[sma_col].iloc[::LABEL_EVERY].index:
+        y = df[sma_col].iloc[idx]
+        if pd.notna(y):
+            x = df['Date'].iloc[idx]
+            plt.text(x, y + 20, f'{y:.1f}', fontsize=8, ha='center', va='bottom')
 
+    # Customize chart
+    plt.title(f"MSFT Close Price vs {WINDOW_SIZE}-Day SMA", fontsize=14)
+    plt.xlabel("Date", fontsize=12)
+    plt.ylabel("Stock Price (USD)", fontsize=12)
+    plt.xticks(rotation=45)
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize=10)
+    plt.tight_layout()
 
-# Customize chart
-plt.title(f"MSFT Close Price vs {window_size}-Day SMA")
-plt.xlabel("Date")
-plt.ylabel("Stock Price (USD)")
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.legend(
-    loc='upper left',
-    bbox_to_anchor=(1, 1),
-    labelspacing=0.5,
-    fontsize=10
-)
-plt.tight_layout()
-plt.show()
+    # Save plot to BytesIO buffer and return as PNG response
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return Response(buf.getvalue(), mimetype='image/png')
+
+# -----------------------------
+# Main
+# -----------------------------
+if __name__ == "__main__":
+    app.run(debug=True)

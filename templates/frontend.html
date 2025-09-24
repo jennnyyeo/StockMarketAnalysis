@@ -1,1 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Market Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f6fa;
+      display: flex;
+    }
+    .sidebar {
+      width: 240px;
+      background: #1f2937;
+      color: #fff;
+      min-height: 100vh;
+      padding: 1rem 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    .sidebar.hidden { transform: translateX(-100%); }
+    .sidebar h2 { text-align: center; margin: 0 0 1.5rem; font-size: 1.2rem; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar ul li { padding: 0.8rem 1.5rem; cursor: pointer; font-size: 0.95rem; }
+    .sidebar ul li:hover { background: #374151; }
+    .sidebar ul li.active { background: #4f46e5; }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-left: 240px;
+      transition: margin-left 0.3s ease;
+    }
+    .main.expanded { margin-left: 0; }
+
+    .topbar {
+      background: #fff;
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .menu-btn { font-size: 1.5rem; cursor: pointer; margin-right: 1rem; }
+
+    .profile { position: relative; cursor: pointer; }
+    .profile-circle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #4f46e5; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; user-select: none;
+    }
+    .dropdown {
+      position: absolute; top: 44px; right: 0;
+      background: #fff; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      list-style: none; padding: 0; margin: 0; width: 180px; display: none;
+    }
+    .dropdown li {
+      padding: 0.8rem 1rem; cursor: pointer; font-size: 0.95rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .dropdown li:hover { background: #f3f4f6; }
+    .dropdown.active { display: block; }
+
+    .content { padding: 1.5rem; }
+    .card { background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+
+    .chart {
+      width: 100%; height: 400px; border-radius: 12px; background: #fff;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.08); padding: 1rem;
+    }
+    .chart img { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; }
+
+    @media (max-width: 768px) { .main { margin-left: 0; } }
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+    <h2>Navigation Bar</h2>
+    <ul>
+      <li class="active">Graph</li>
+      <li>Dashboard</li>
+      <li>Crypto</li>
+      <li>Portfolio</li>
+      <li>Settings</li>
+    </ul>
+  </div>
+
+  <div class="main" id="main">
+    <div class="topbar">
+      <span class="menu-btn" id="menuBtn">☰</span>
+      <h3>Stock Market Analysis Program</h3>
+      <div class="profile" id="profile">
+        <div class="profile-circle">👤</div>
+        <ul class="dropdown" id="dropdown">
+          <li>👤 Account Management</li>
+          <li>⚙️ Settings</li>
+          <li>🚪 Logout</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <h4>Graph</h4>
+        <div class="chart">
+          <img src="http://127.0.0.1:5000/plot.png?t=1" alt="MSFT SMA Chart" id="smaChart">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('main');
+    const profile = document.getElementById('profile');
+    const dropdown = document.getElementById('dropdown');
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+      main.classList.toggle('expanded');
+    });
+
+    profile.addEventListener('click', e => {
+      e.stopPropagation();
+      dropdown.classList.toggle('active');
+    });
+
+    document.addEventListener('click', e => {
+      if (!profile.contains(e.target)) dropdown.classList.remove('active');
+    });
+  </script>
+</body>
+</html>
 
