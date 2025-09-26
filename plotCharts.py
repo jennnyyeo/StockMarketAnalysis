@@ -1,8 +1,11 @@
 from flask import Flask, Response, render_template, request
 import pandas as pd
-import matplotlib.pyplot as plt
 import io
 import os
+import matplotlib
+matplotlib.use('Agg')   # Fixes the Tkinter backend issue
+import matplotlib.pyplot as plt
+
 
 app = Flask(__name__)
 
@@ -15,11 +18,12 @@ def dashboard():
 
 @app.route("/plot.png")
 def plot_png():
+    # Only allow 20 or 50
     try:
         window_size = int(request.args.get("t", 20))
-        if window_size <= 0:
-            window_size = 20
-    except ValueError:
+        if window_size not in [20, 50]:
+            window_size = 20  # default to 20 if invalid
+    except (ValueError, TypeError):
         window_size = 20
 
     if not os.path.exists(CSV_FILE):
@@ -29,12 +33,27 @@ def plot_png():
     df['Date'] = pd.to_datetime(df['Date'])
     df['Close/Last'] = df['Close/Last'].replace('[\$,]', '', regex=True).astype(float)
 
-    sma_col = f'SMA_{window_size}'
-    df[sma_col] = df['Close/Last'].rolling(window=window_size).mean()
+    # KAI JUN'S CODE
+    def SMA(close, period):
+        sma = []
+        for i in range(len(close)):
+            if i < period - 1:
+                sma.append(None)
+            else:
+                total = 0
+                for j in range(period):
+                    total+=close[i-j] 
+                sma.append(total / period)
+        return sma
+    
+    sma_col = f'custom_SMA_{window_size}'
+    df[sma_col] = SMA(df['Close/Last'], window_size)
 
+    # Plotting
     plt.figure(figsize=(12, 6))
     plt.plot(df['Date'], df['Close/Last'], linewidth=1, label='MSFT Close Price')
-    plt.plot(df['Date'], df[sma_col], linestyle='--', linewidth=1.5, color='orange', label=f'{window_size}-Day SMA')
+    plt.plot(df['Date'], df[sma_col], linestyle='--', linewidth=1.5, color='orange',
+             label=f'{window_size}-Day SMA')
 
     for idx in df[sma_col].iloc[::LABEL_EVERY].index:
         y = df[sma_col].iloc[idx]
