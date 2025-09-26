@@ -44,6 +44,17 @@ def bshalgorithm(data, streak_threshold=5, profit_threshold=0.05):
 
         
         signals.append(signal)
+        
+        if signal == 'Buy':
+            buy_dates.append(data.index[i])
+            
+        elif signal == 'Sell':
+            sell_dates.append(data.index[i])
+        
+        data['Signal'] = signal
+        
+        return data, buy_dates, sell_dates
+
 
         
 
