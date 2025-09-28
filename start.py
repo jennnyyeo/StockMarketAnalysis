@@ -1,12 +1,28 @@
 import pandas
 from advice import sma_risk_tips 
 
-data = pandas.read_csv('MSFT.csv')
+## data = pandas.read_csv('MSFT.csv')
 
 '''
 corner cases, such as when the data series is shorter than
 the SMA window, or when one day’s data is missing.
 '''
+
+def SMA(close,period):
+    sma=[]
+    
+    for i in range(len(close)):
+        if i<period-1: #index 0-3
+            sma.append(None)
+        else:   # index 4
+            total=0
+            for j in range(period):
+                total+=close[i-j] 
+            sma.append(total/period)   
+    return sma
+
+if __name__ == "__main__":
+    data = pandas.read_csv('MSFT.csv')
 # Empty list to store cleaned values
 cleaned = []
 
@@ -25,21 +41,6 @@ else:
 
 # period 2 to last day
 
-
-def SMA(close,period):
-    sma=[]
-    
-    for i in range(len(close)):
-        if i<period-1: #index 0-3
-            sma.append(None)
-        else:   # index 4
-            total=0
-            for j in range(period):
-                total+=close[i-j] 
-            sma.append(total/period)
-           
-    return sma
-     
 
 data['custom_SMA']=SMA(data['Close/Last'],period) 
 # test validation

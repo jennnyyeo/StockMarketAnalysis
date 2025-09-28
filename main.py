@@ -2,9 +2,15 @@
 # from algorithm import bshalgorithm
 # from dailyReturns import daily_returns
 # from plotCharts import plot_png
+import pandas as pd
 from flask import Flask, Response, render_template, request
 
 app = Flask(__name__)
+
+def load_prices():
+    df = pd.read_csv("MSFT.csv")
+    df["Close/Last"] = df["Close/Last"].astype(str).str.lstrip("$").astype(float)
+    
 
 results_cache = None
 
