@@ -1,5 +1,6 @@
-# from start import SMA
-# from algorithm import bshalgorithm
+from start import SMA
+from algorithm import bshalgorithm
+from streakIdentifier import streakIdentifier
 # from dailyReturns import daily_returns
 # from plotCharts import plot_png
 import pandas as pd
@@ -21,3 +22,8 @@ def home():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    df = pd.read_csv('MSFT.csv')
+    for col in ['Close/Last', 'High', 'Low']:
+        df[col] = df[col].str.replace('$', '').astype(float)
+
+    ndata, buy_dates, sell_dates = bshalgorithm(df)

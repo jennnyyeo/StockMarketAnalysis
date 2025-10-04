@@ -1,67 +1,78 @@
-def bshalgorithm(data, streak_threshold=5, profit_threshold=0.05):
+from streakIdentifier import streakIdentifier
+import pandas as pd
+# from start import SMA
+
+def bshalgorithm(data):
     signals = []
     buy_dates = []
     sell_dates = []
+    streak_threshold=5
+    profit_threshold=0.05
+    ndata = streakIdentifier(data, 20, 50)
+    sma_20list = ndata['SMA']  
+    sma_50list = ndata['SMA1']   
+    print(len(ndata))
 
-    data['SMA_20'] = calculate_sma(data, 20)  
-    data['SMA_50'] = calculate_sma(data, 50)
-    data['Streaks'] = streakindetifier(data)  
-    price_now = data['Close'].iloc[i] 
-
-    for i in range(len(data)):
-        if i < 50:
-            signals.append['Hold']
+    for i in range(len(ndata)):
+        if len(ndata) < 50:
+            signals.append('Hold')
             continue
-        sma_20 = data['SMA_20'].iloc[i]
-        sma_50 = data['SMA_50'].iloc[i]
-        streak = data['Streaks'].iloc[i]
-
-        sma_20_prev = data['SMA_20'].iloc[i-1]
-        sma_50_prev = data['SMA_50'].iloc[i-1]
-
-        signal = 'Hold'
-
-        #Rule 1: SMA Crossover  
-        if sma_20 > sma_50 and sma_20_prev <= sma_50_prev:
-            signal = 'Buy'
-
-        elif sma_20 < sma_50 and sma_20_prev >= sma_50_prev:
-            signal = 'Sell'
+        else:
+            sma_20 = sma_20list.iloc[i]
+            sma_50 = sma_50list.iloc[i]
+            streak = ndata['Streak'].iloc[i]
+            price_now = ndata['Close/Last'].iloc[i]
             
-        #Rule 2: Streak Reversal
-        elif streak <= -streak_threshold:
-            signal = 'Buy'
+            sma_20_prev = sma_20list.iloc[i-1]
+            sma_50_prev = sma_50list.iloc[i-1]
 
-        elif streak >= streak_threshold:
-            signal = 'Sell'
-            
-        #Rule 3: Dip-buying / Profit-Taking 
-        elif i > 5:
-            pricelowrecent = min(data['Low'].iloc[i-5:i])
-            pricehighrecent = max(data['High'].iloc[i-5:i])
+            signal = 'Hold'
 
-            if price_now > pricelowrecent*(1 + profit_threshold):
+            #Rule 1: SMA Crossover  
+            if sma_20 > sma_50 and sma_20_prev <= sma_50_prev:
                 signal = 'Buy'
 
-            elif price_now > pricehighrecent*(1 - profit_threshold):
+            elif sma_20 < sma_50 and sma_20_prev >= sma_50_prev:
                 signal = 'Sell'
+                
+            #Rule 2: Streak Reversal
+            elif streak <= -streak_threshold:
+                signal = 'Buy'
 
-        
-        signals.append(signal)
-        
-        if signal == 'Buy':
-            buy_dates.append(data.index[i])
+            elif streak >= streak_threshold:
+                signal = 'Sell'
+                
+            #Rule 3: Dip-buying / Profit-Taking 
+            elif i > 5:
+                pricelowrecent = min(ndata['Low'].iloc[i-5:i])
+                pricehighrecent = max(ndata['High'].iloc[i-5:i])
+
+                if price_now > pricelowrecent*(1 + profit_threshold):
+                    signal = 'Buy'
+
+                elif price_now > pricehighrecent*(1 - profit_threshold):
+                    signal = 'Sell'
+
             
-        elif signal == 'Sell':
-            sell_dates.append(data.index[i])
+            signals.append(signal)
+            
+            if signal == 'Buy':
+                buy_dates.append(ndata['Date'].iloc[i])
+                
+            elif signal == 'Sell':
+                sell_dates.append(ndata['Date'].iloc[i])
+            
+    ndata['Signal'] = signals
         
-    data['Signal'] = signal
-        
-    return data, buy_dates, sell_dates
+    return ndata, buy_dates, sell_dates
 
 
-        
+df = pd.read_csv('MSFT.csv')
+for col in ['Close/Last', 'High', 'Low']:
+    df[col] = df[col].str.replace('$', '').astype(float)
+       
+ndata, buy_dates, sell_dates = bshalgorithm(df)
 
-        
+
 
         
