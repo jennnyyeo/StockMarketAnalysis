@@ -7,7 +7,9 @@
 </head>
 <body class="container mt-4">
     <h1>Run Trading Algorithm</h1>
-    <form action="/run" method="post" class="card p-3">
+    
+    <!-- #### fixed action="/" instead of /run -->
+    <form action="/" method="post" class="card p-3">  
         <div class="mb-3">
             <label for="ticker" class="form-label">Stock Ticker:</label>
             <input type="text" class="form-control" id="ticker" name="ticker" value="MSFT">
@@ -21,5 +23,10 @@
         </div>
         <button type="submit" class="btn btn-primary">Run Algorithm</button>
     </form>
+
+    <div class="card mt-4 p-3">
+        
+        <pre style="white-space: pre-wrap; font-family: inherit;">{{ advice }}</pre>
+    </div>
 </body>
 </html>

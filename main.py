@@ -1,29 +1,36 @@
 from start import SMA
 from algorithm import bshalgorithm
 from streakIdentifier import streakIdentifier
+from advice import give_advice_text
 # from dailyReturns import daily_returns
 # from plotCharts import plot_png
 import pandas as pd
-from flask import Flask, Response, render_template, request
+from flask import Flask, render_template, request  
 
 app = Flask(__name__)
 
-def load_prices():
-    df = pd.read_csv("MSFT.csv")
-    df["Close/Last"] = df["Close/Last"].astype(str).str.lstrip("$").astype(float)
-    
+def load_prices(ticker="MSFT"):  
+    df = pd.read_csv(f"{ticker}.csv")
+    for col in ["Close/Last", "High", "Low"]:
+        df[col] = df[col].astype(str).str.lstrip("$").astype(float)
+    return df
 
-results_cache = None
-
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])   
 def home():
-    return render_template("index.html")
+    advice_output = ""   
+    
+    if request.method == "POST":   
+        ticker = request.form.get("ticker", "MSFT")
+        strategy = request.form.get("strategy", "default")
+        
+        # Load prices & run algorithm
+        df = load_prices(ticker)
+        ndata, buy_dates, sell_dates = bshalgorithm(df)
 
+        # Generate advice
+        advice_output = give_advice_text(ndata)
+
+    return render_template("index.html", advice=advice_output)  
 
 if __name__ == "__main__":
     app.run(debug=True)
-    df = pd.read_csv('MSFT.csv')
-    for col in ['Close/Last', 'High', 'Low']:
-        df[col] = df[col].str.replace('$', '').astype(float)
-
-    ndata, buy_dates, sell_dates = bshalgorithm(df)
