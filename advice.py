@@ -1,7 +1,7 @@
 import pandas as pd
 
 def give_advice_text(ndata: pd.DataFrame, streak_warn: int = 5) -> str:
-    latest = ndata.iloc[-1]
+    latest = ndata.iloc[0]
     signal = latest['Signal']
     streak = latest['Streak']
 
@@ -64,17 +64,17 @@ def give_advice_text(ndata: pd.DataFrame, streak_warn: int = 5) -> str:
     return "\n".join(lines)
 
 ## this is just for my testingm, can remove this 
-'''if __name__ == "__main__":
-    import pandas as pd
-    from algorithm import bshalgorithm
+# if __name__ == "__main__":
+#     import pandas as pd
+#     from algorithm import bshalgorithm
 
-    # Load sample data (MSFT.csv)
-    df = pd.read_csv("MSFT.csv")
-    for col in ["Close/Last", "High", "Low"]:
-        df[col] = df[col].astype(str).str.replace("$", "", regex=False).astype(float)
+#     # Load sample data (MSFT.csv)
+#     df = pd.read_csv("MSFT.csv")
+#     for col in ["Close/Last", "High", "Low"]:
+#         df[col] = df[col].astype(str).str.replace("$", "", regex=False).astype(float)
 
-    # Run algorithm to generate signals
-    ndata, buy_dates, sell_dates = bshalgorithm(df)
+#     # Run algorithm to generate signals
+#     ndata, buy_dates, sell_dates = bshalgorithm(df)
 
-    print("\n=== Text Version Output (for Flask) ===")
-    print(give_advice_text(ndata))   # prints the returned text string '''
+#     print("\n=== Text Version Output (for Flask) ===")
+#     print(give_advice_text(ndata))   # prints the returned text string
