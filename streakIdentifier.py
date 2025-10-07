@@ -15,7 +15,9 @@ def SMA(close,period):
     return sma
 
 def streakIdentifier(data, period, period1):
-    data = data.iloc[::-1].reset_index(drop=True)
+    data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
+    data['_orig_order'] = range(len(data))
+    data = data.sort_values(['Date'], ascending=True, kind='mergesort').reset_index(drop=True)
     data['SMA'] = SMA(data['Close/Last'], period)
     data['SMA1'] = SMA(data['Close/Last'], period1)
     data = data.dropna().reset_index(drop=True)
@@ -27,7 +29,7 @@ def streakIdentifier(data, period, period1):
         else:
             streak -= 1
         data.at[i, 'Streak'] = streak
-    data = data.iloc[::-1].reset_index(drop=True)    
+    data = data.sort_values('_orig_order').drop(columns='_orig_order').reset_index(drop=True)   
     return data
 
 
