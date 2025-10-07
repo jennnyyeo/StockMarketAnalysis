@@ -3,57 +3,46 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
+from streakIdentifier import streakIdentifier, SMA
 
 CSV_FILE = "MSFT.csv"
-LABEL_EVERY = 50
-
-def SMA(close, period):
-    sma = []
-    for i in range(len(close)):
-        if i < period - 1:
-            sma.append(None)
-        else:
-            total = sum(close[i-j] for j in range(period))
-            sma.append(total / period)
-    return sma
-
-def streakIdentifier(data, period, period1):
-    data['SMA'] = SMA(data['Close/Last'], period)
-    data['SMA1'] = SMA(data['Close/Last'], period1)
-    data = data.dropna().reset_index(drop=True)
-    data.loc[:, 'Streak'] = 0
-
-    streak = 0
-    for i in range(1, len(data)):
-        if data.at[i, 'SMA'] > data.at[i-1, 'SMA'] or data.at[i, 'SMA1'] > data.at[i-1, 'SMA1']:
-            streak += 1
-        else:
-            streak -= 1
-        data.at[i, 'Streak'] = streak
-        
-    return data
 
 def generate_streak_chart(year=None):
-    # Load CSV
+    # Load and clean CSV
     df = pd.read_csv(CSV_FILE)
     df['Date'] = pd.to_datetime(df['Date'])
     df['Close/Last'] = df['Close/Last'].replace('[\$,]', '', regex=True).astype(float)
 
-    # Filter by year if provided
-    if year is not None:
-        df = df[df['Date'].dt.year == year]
+    # Sort chronologically (oldest first)
+    df = df.sort_values('Date').reset_index(drop=True)
 
-    # Compute streak
-    df_streak = streakIdentifier(df, 20, 50)
+    # Compute streak on full dataset
+    df_streak = streakIdentifier(df, period=20, period1=50)
 
+    # Filter by year **after computing streak**
+    if year is not None and year != "All":
+        df_streak = df_streak[df_streak['Date'].dt.year == int(year)].reset_index(drop=True)
+
+    # Handle empty filtered dataset
+    if df_streak.empty:
+        plt.figure(figsize=(12,6))
+        plt.text(0.5, 0.5, f"No data for year {year}", ha='center', va='center', fontsize=16)
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        plt.close()
+        buf.seek(0)
+        return buf.getvalue()
+
+    # Plot streak chart
     plt.figure(figsize=(12,6))
     plt.plot(df_streak['Date'], df_streak['Streak'], linewidth=1.5, color='blue', label='Streak')
 
-    # Label every N points
-    for idx in df_streak['Streak'].iloc[::LABEL_EVERY].index:
-        y = df_streak['Streak'].iloc[idx]
-        x = df_streak['Date'].iloc[idx]
-        plt.text(x, y + 0.5, f'{y}', fontsize=8, ha='center', va='bottom')
+    # Highlight highest streak point in the filtered data
+    max_idx = df_streak['Streak'].idxmax()
+    x_max = df_streak['Date'].iloc[max_idx]
+    y_max = df_streak['Streak'].iloc[max_idx]
+    plt.scatter(x_max, y_max, color='red', s=50, zorder=5)
+    plt.text(x_max, y_max + 0.5, f'{y_max}', fontsize=10, ha='center', va='bottom', color='red')
 
     plt.title(f"Streak Over Time{' - ' + str(year) if year else ''}", fontsize=14)
     plt.xlabel("Date", fontsize=12)
@@ -63,9 +52,9 @@ def generate_streak_chart(year=None):
     plt.legend(loc='upper left', bbox_to_anchor=(1,1), fontsize=10)
     plt.tight_layout()
 
+    # Save plot to BytesIO
     buf = io.BytesIO()
     plt.savefig(buf, format='png')
     plt.close()
     buf.seek(0)
     return buf.getvalue()
-

@@ -45,13 +45,10 @@ def plot_png():
 
 @app.route("/streak.png")
 def streak_png():
-    year = request.args.get("year")  # get year from query string
-    try:
-        year = int(year)
-    except (TypeError, ValueError):
-        year = None  # if no year or invalid, plot all data
+    year = request.args.get("year", "All")  # default: all years
     png_bytes = generate_streak_chart(year)
-    return Response(png_bytes, mimetype='image/png')
+    return Response(png_bytes, mimetype="image/png")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
