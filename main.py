@@ -1,11 +1,10 @@
-from start import SMA
 from algorithm import bshalgorithm
 from streakIdentifier import streakIdentifier
 from advice import give_advice_text
 # from dailyReturns import daily_returns
-# from plotCharts import plot_png
+from plotCharts import generate_sma_chart
 import pandas as pd
-from flask import Flask, render_template, request  
+from flask import Flask, render_template, Response, request 
 
 app = Flask(__name__)
 
@@ -31,6 +30,17 @@ def home():
         advice_output = give_advice_text(ndata)
 
     return render_template("index.html", advice=advice_output)  
+
+@app.route("/plot.png")
+def plot_png():
+    # Get SMA window from URL param, default to 20
+    try:
+        window_size = int(request.args.get("t", 20))
+    except (ValueError, TypeError):
+        window_size = 20
+
+    png_bytes = generate_sma_chart(window_size)
+    return Response(png_bytes, mimetype="image/png")
 
 if __name__ == "__main__":
     app.run(debug=True)
