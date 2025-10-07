@@ -3,7 +3,7 @@ import pandas as pd
 def give_advice_text(ndata: pd.DataFrame, streak_warn: int = 5) -> str:
     latest = ndata.iloc[0]
     signal = latest['Signal']
-    streak = latest['Streak']
+    streak = latest['StreakIdx']
 
     lines = []
     lines.append("=== Trading Advice ===")
