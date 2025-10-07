@@ -145,9 +145,9 @@
     <div class="sidebar" id="sidebar">
         <h2>SMA Company</h2>
         <ul>
-        <li><a href="frontend.html">Dashboard</a></li>
-        <li class="active"><a href="index.html">Trading Algorithm</a></li>
-        <li><a href="graph.html">Streak Display</a></li>
+        <li><a href="{{ url_for('smagraph') }}">SMA GRAPH</a></li>
+        <li class="active"><a href="{{ url_for('home') }}">Trading Algorithm</a></li>
+        <li><a href="{{ url_for('graph') }}">Streak Display</a></li>
         <li><a href="#">Portfolio</a></li>
         <li><a href="#">Settings</a></li>
         </ul>

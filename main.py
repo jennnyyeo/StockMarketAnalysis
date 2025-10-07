@@ -49,6 +49,13 @@ def streak_png():
     png_bytes = generate_streak_chart(year)
     return Response(png_bytes, mimetype="image/png")
 
+@app.route('/graph')
+def graph():
+    return render_template("graph.html")
+
+@app.route('/smagraph')
+def smagraph():
+    return render_template("frontend.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
