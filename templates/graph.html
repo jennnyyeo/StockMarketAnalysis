@@ -1,1 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Streak Display</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f6fa;
+    display: flex;
+}
 
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    background: #1f2937;
+    color: #fff;
+    min-height: 100vh;
+    padding: 1rem 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    transition: transform 0.3s ease;
+    z-index: 1000;
+}
+.sidebar.hidden { transform: translateX(-100%); }
+.sidebar h2 { text-align: center; margin: 0 0 1.5rem; font-size: 1.2rem; }
+.sidebar ul { list-style: none; padding: 0; margin: 0; }
+.sidebar ul li { padding: 0.8rem 1.5rem; cursor: pointer; font-size: 0.95rem; }
+.sidebar ul li:hover { background: #374151; }
+.sidebar ul li.active { background: #4f46e5; }
+.sidebar ul li a { color: #fff; text-decoration: none; display: block; width: 100%; }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; margin-left: 240px; transition: margin-left 0.3s ease; }
+.main.expanded { margin-left: 0; }
+
+/* Topbar */
+.topbar { background: #fff; padding: 0.8rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 4px rgba(0,0,0,0.1); position: relative; }
+.menu-btn { font-size: 1.5rem; cursor: pointer; margin-right: 1rem; }
+
+/* Profile */
+.profile { position: relative; cursor: pointer; }
+.profile-circle { width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.dropdown { position: absolute; right: 0; top: 48px; background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow: hidden; display: none; min-width: 180px; z-index: 2000; }
+.dropdown.active { display: block; }
+.dropdown li { list-style: none; padding: 0.8rem 1rem; font-size: 0.95rem; color: #374151; cursor: pointer; }
+.dropdown li:hover { background: #f3f4f6; }
+
+/* Content */
+.content { padding: 2rem; width: 100%; }
+
+/* Chart container */
+.chart-container { background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+</style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h2>SMA Company</h2>
+    <ul>
+        <li><a href="frontend.html">Dashboard</a></li>
+        <li><a href="index.html">Trading Algorithm</a></li>
+        <li class="active"><a href="graph.html">Streak Display</a></li>
+        <li><a href="#">Portfolio</a></li>
+        <li><a href="#">Settings</a></li>
+    </ul>
+</div>
+
+<!-- Main content -->
+<div class="main" id="main">
+    <!-- Topbar -->
+    <div class="topbar">
+        <span class="menu-btn" id="menuBtn">☰</span>
+        <h3>Streak Display</h3>
+        <div class="profile" id="profile">
+            <div class="profile-circle">👤</div>
+            <ul class="dropdown" id="dropdown">
+                <li>Account Management</li>
+                <li>Settings</li>
+                <li>Logout</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="content">
+        <div class="chart-container">
+            <canvas id="streakChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sidebar toggle
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+const main = document.getElementById('main');
+menuBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+    main.classList.toggle('expanded');
+});
+
+// Profile dropdown
+const profile = document.getElementById('profile');
+const dropdown = document.getElementById('dropdown');
+profile.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('active');
+});
+document.addEventListener('click', (e) => {
+    if (!profile.contains(e.target)) dropdown.classList.remove('active');
+});
+
+// Fetch streak data and render chart
+fetch('/streak-data')
+.then(res => res.json())
+.then(data => {
+    const ctx = document.getElementById('streakChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.dates,
+            datasets: [{
+                label: 'Streak',
+                data: data.streaks,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79,70,229,0.1)',
+                fill: true,
+                tension: 0.2,
+                pointRadius: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    display: true,
+                    title: { display: true, text: 'Date' },
+                    ticks: { maxRotation: 90, minRotation: 45 }
+                },
+                y: {
+                    display: true,
+                    title: { display: true, text: 'Streak' }
+                }
+            },
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>

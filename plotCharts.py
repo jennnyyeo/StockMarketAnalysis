@@ -3,7 +3,7 @@ import pandas as pd
 import io
 import os
 import matplotlib
-matplotlib.use('Agg')   # Fixes the Tkinter backend issue
+matplotlib.use('Agg')   
 import matplotlib.pyplot as plt
 
 
