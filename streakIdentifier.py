@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def SMA(close,period):
     sma=[]
@@ -14,11 +15,11 @@ def SMA(close,period):
     return sma
 
 def streakIdentifier(data, period, period1):
+    data = data.iloc[::-1].reset_index(drop=True)
     data['SMA'] = SMA(data['Close/Last'], period)
     data['SMA1'] = SMA(data['Close/Last'], period1)
     data = data.dropna().reset_index(drop=True)
     data.loc[:, 'Streak'] = 0
-
     streak = 0
     for i in range(1, len(data)):
         if data.at[i, 'SMA'] > data.at[i-1, 'SMA'] or data.at[i, 'SMA1'] > data.at[i-1, 'SMA1']:
@@ -26,7 +27,7 @@ def streakIdentifier(data, period, period1):
         else:
             streak -= 1
         data.at[i, 'Streak'] = streak
-        
+    data = data.iloc[::-1].reset_index(drop=True)    
     return data
 
 
