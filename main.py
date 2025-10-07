@@ -3,6 +3,7 @@ from streakIdentifier import streakIdentifier
 from advice import give_advice_text
 # from dailyReturns import daily_returns
 from plotCharts import generate_sma_chart
+from streakChart import generate_streak_chart
 import pandas as pd
 from flask import Flask, render_template, Response, request 
 
@@ -41,6 +42,16 @@ def plot_png():
 
     png_bytes = generate_sma_chart(window_size)
     return Response(png_bytes, mimetype="image/png")
+
+@app.route("/streak.png")
+def streak_png():
+    year = request.args.get("year")  # get year from query string
+    try:
+        year = int(year)
+    except (TypeError, ValueError):
+        year = None  # if no year or invalid, plot all data
+    png_bytes = generate_streak_chart(year)
+    return Response(png_bytes, mimetype='image/png')
 
 if __name__ == "__main__":
     app.run(debug=True)
