@@ -132,6 +132,32 @@
                 margin-left: 0; 
             } 
         }
+
+        .year-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            margin: 0.3rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .year-btn:hover {
+            background-color: #3730a3;
+        }
+
+        .year-btn.active {
+            background-color: #1f2937; /* dark color for selected */
+            color: #fff;
+        }
+
+        select {
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            margin-bottom: 1rem;
+        }
         </style>
     </head>
     
@@ -155,8 +181,15 @@
             
             <div class="content">
                 <div class="card">
-                    <div style="text-align: center;">
-                        <label for="smaInput">Select Year:</label> 
+                    <!-- Dropdown for selecting company -->
+                     <div style="text-align: center; margin-bottom: 1rem;">
+                        <label for="tickerSelect"><b>Select Company:</b></label>
+                        <select id="tickerSelect" style="margin-left: 8px; padding: 5px;">
+                            <option value="MSFT">Microsoft (MSFT)</option>
+                            <option value="AMD">Advanced Micro Devices (AMD)</option>
+                            <option value="AMZN">Amazon (AMZN)</option>
+                            <option value="NFLX">Netflix (NFLX)</option>
+                        </select>
                     </div>
                     <div style="text-align:center; margin-bottom:1rem;">
                         <button class="year-btn" data-year="2020">2020</button>
@@ -167,7 +200,7 @@
                         <button class="year-btn" data-year="2025">2025</button>
                     </div>
                     <div class="chart">
-                        <img src="http://127.0.0.1:5000/streak.png?year=2020" alt="Streak Chart" id="streakChart">
+                        <img src="http://127.0.0.1:5000/streak.png?year=2020&ticker=MSFT" alt="Streak Chart" id="streakChart">
                     </div>
                 </div>
             </div>
@@ -186,31 +219,37 @@
             
             const yearButtons = document.querySelectorAll(".year-btn");
             const streakChart = document.getElementById("streakChart");
+            const tickerSelect = document.getElementById("tickerSelect");
             
-            yearButtons.forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const year = btn.getAttribute("data-year");
-                    let url = "";
-                    
-                    // Map year to the URL
-                    if (year === "2020") {
-                        url = "http://127.0.0.1:5000/streak.png?year=2020";
-                    } else if (year === "2021") {
-                        url = "http://127.0.0.1:5000/streak.png?year=2021";
-                    } else if (year === "2022") {
-                        url = "http://127.0.0.1:5000/streak.png?year=2022";
-                    } else if (year === "2023") {
-                        url = "http://127.0.0.1:5000/streak.png?year=2023";
-                    } else if (year === "2024") {
-                        url = "http://127.0.0.1:5000/streak.png?year=2024";
-                    } else if (year === "2025") {
-                        url = "http://127.0.0.1:5000/streak.png?year=2025";
-                    }
+            let currentTicker = tickerSelect.value; // default company
+            let currentYear = "2020";                // default year
 
-                    // Add timestamp to bypass cache
-                    streakChart.src = url + "&_=" + new Date().getTime();
+            // Update chart function
+            function updateChart() {
+                // Build URL dynamically using ticker and year
+                const url = `http://127.0.0.1:5000/streak.png?year=${currentYear}&ticker=${currentTicker}&_=${new Date().getTime()}`;
+                streakChart.src = url; // update the <img> src
+                }
+            
+                // Change company
+                tickerSelect.addEventListener("change", () => {
+                    currentTicker = tickerSelect.value;
+                    updateChart();
                 });
-            });
+                
+                // Change year
+                yearButtons.forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        currentYear = btn.getAttribute("data-year");
+                        updateChart();
+
+                        // Remove 'active' class from all buttons
+                        yearButtons.forEach(b => b.classList.remove("active"));
+
+                        // Add 'active' class to the clicked button
+                        btn.classList.add("active");
+                    });
+                });
         </script>
     </body>
 </html>

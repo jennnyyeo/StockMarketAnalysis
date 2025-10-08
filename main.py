@@ -38,23 +38,43 @@ def home():
         fdata.to_csv('ndata.csv', index=False)
     return render_template("index.html", advice=advice_output)  
 
+# Route to generate SMA chart as PNG image
 @app.route("/plot.png")
 def plot_png():
-    # Get SMA window from URL param, default to 20
+    # Get the company ticker from URL parameters, default to "MSFT" if not provided
+    ticker = request.args.get("ticker", "MSFT")  
+    
+    # Get the SMA window size from URL parameters, default to 20 if not provided or invalid
     try:
         window_size = int(request.args.get("t", 20))
     except (ValueError, TypeError):
         window_size = 20
 
-    png_bytes = generate_sma_chart(window_size)
+    # Generate the SMA chart as PNG bytes using the selected ticker and window size
+    png_bytes = generate_sma_chart(window_size, ticker)
+    
+    # Return the PNG image as a response with proper MIME type
     return Response(png_bytes, mimetype="image/png")
 
+
+# Route to generate Streak chart as PNG image
 @app.route("/streak.png")
 def streak_png():
-    year = request.args.get("year", "All")  # default: all years
-    df = load_prices("MSFT")
-    png_bytes = generate_streak_chart(df, year)
+    # Get the company ticker from URL parameters, default to "MSFT" if not provided
+    ticker = request.args.get("ticker", "MSFT")
+    
+    # Get the year to filter streaks, default to 2020 if not provided
+    year = request.args.get("year", "2020")
+    
+    # Load price data for the selected company
+    df = load_prices(ticker)
+    
+    # Generate streak chart for the selected ticker and year as PNG bytes
+    png_bytes = generate_streak_chart(df, year, ticker)
+    
+    # Return the PNG image as a response with proper MIME type
     return Response(png_bytes, mimetype="image/png")
+
 
 @app.route('/graph')
 def graph():

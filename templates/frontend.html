@@ -138,6 +138,32 @@
         margin-left: 0;
       }
     }
+
+    .sma-btn {
+        background-color: #4f46e5;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        margin: 0.3rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .sma-btn:hover {
+        background-color: #3730a3;
+      }
+
+      .sma-btn.active {
+            background-color: #1f2937; /* dark color for selected */
+            color: #fff;
+        }
+
+      select {
+        border-radius: 6px;
+        padding: 0.4rem 0.6rem;
+        margin-bottom: 1rem;
+      }
     </style>
   </head>
   
@@ -157,52 +183,87 @@
       <!-- Topbar -->
       <div class="topbar">
         <span class="menu-btn" id="menuBtn">☰</span>
-        <h3>Graph</h3>
+        <h3>SMA Graph</h3>
       </div>
       
       <div class="content">
         <div class="card">
-          <div style="text-align: center;">
-            <label for="smaInput">Select SMA window:</label>
+          <!-- Dropdown for selecting company -->
+          <div style="text-align: center; margin-bottom: 1rem;">
+            <label for="tickerSelect"><b>Select Company:</b></label>
+            <select id="tickerSelect" style="margin-left: 8px; padding: 5px;">
+              <option value="MSFT">Microsoft (MSFT)</option>
+              <option value="AMD">Advanced Micro Devices (AMD)</option>
+              <option value="AMZN">Amazon (AMZN)</option>
+              <option value="NFLX">Netflix (NFLX)</option>
+            </select>
           </div>
+
+          <!-- SMA selection buttons -->
+          <div style="text-align: center;">
+            <label><b>Select SMA window:</b></label>
+          </div>
+
           <div style="margin-bottom: 1rem; text-align: center;">
             <button class="sma-btn" data-sma="20">20-Day SMA</button>
             <button class="sma-btn" data-sma="50">50-Day SMA</button>
           </div>
+          
+          <!-- Chart area -->
           <div class="chart">
             <img src="http://127.0.0.1:5000/plot.png?t=20" alt="MSFT SMA Chart" id="smaChart">
           </div>
+
         </div>
       </div>
     </div>
     
     <script>
+      // Sidebar toggle elements
       const menuBtn = document.getElementById('menuBtn');
       const sidebar = document.getElementById('sidebar');
       const main = document.getElementById('main');
+
+      // SMA buttons and chart image
+      const buttons = document.querySelectorAll(".sma-btn");
+      const chart = document.getElementById("smaChart");
       
-      // Sidebar toggle
+      // Company dropdown
+      const tickerSelect = document.getElementById("tickerSelect");
+      
+      // Default selections
+      let currentTicker = tickerSelect.value; // default company
+      let currentSMA = 20;                     // default SMA
+    
+      // Toggle sidebar visibility
       menuBtn.addEventListener('click', () => {
         sidebar.classList.toggle('hidden');
         main.classList.toggle('expanded');
       });
       
-      const buttons = document.querySelectorAll(".sma-btn");
-      const chart = document.getElementById("smaChart");
+      // Function to update chart image
+      function updateChart() {
+        const url = `http://127.0.0.1:5000/plot.png?ticker=${currentTicker}&t=${currentSMA}&_=${new Date().getTime()}`;
+        chart.src = url;
+      }
       
+      // Update chart when company selection changes
+      tickerSelect.addEventListener("change", () => {
+        currentTicker = tickerSelect.value;
+        updateChart();
+      });
+    
+      // Update chart when SMA button is clicked
       buttons.forEach(btn => {
         btn.addEventListener("click", () => {
-          const t = btn.getAttribute("data-sma");
-          let url = "";
-          
-          if (t === "20") {
-            url = "http://127.0.0.1:5000/plot.png?t=20";
-          } else if (t === "50") {
-            url = "http://127.0.0.1:5000/plot.png?t=50";
-          }
-          
-          // Add timestamp to bypass cache
-          chart.src = url + "&_=" + new Date().getTime();
+          currentSMA = btn.getAttribute("data-sma");
+          updateChart();
+
+          // Remove 'active' class from all buttons
+          buttons.forEach(b => b.classList.remove("active"));
+
+          // Add 'active' class to the clicked button
+          btn.classList.add("active");
         });
       });
     </script>
