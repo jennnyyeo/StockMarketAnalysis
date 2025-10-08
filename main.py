@@ -52,7 +52,7 @@ def plot_png():
 @app.route("/streak.png")
 def streak_png():
     year = request.args.get("year", "All")  # default: all years
-    df = load_prices('MSFT')
+    df = load_prices("MSFT")
     png_bytes = generate_streak_chart(df, year)
     return Response(png_bytes, mimetype="image/png")
 

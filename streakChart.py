@@ -19,7 +19,7 @@ def generate_streak_chart(data, year=None):
     df = df.sort_values('Date').reset_index(drop=True)
 
     # Compute streak on full dataset
-    df_streak = streakIdentifier(df, period=20, period1=50)
+    df_streak = streakIdentifier(df)
 
     # Filter by year **after computing streak**
     if year is not None and year != "All":
