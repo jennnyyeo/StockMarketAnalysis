@@ -26,35 +26,42 @@
             transition: transform 0.3s ease;
             z-index: 1000;
         }
+
         .sidebar.hidden {
             transform: translateX(-100%);
         }
+
         .sidebar h2 {
             text-align: center;
             margin: 0 0 1.5rem;
             font-size: 1.2rem;
         }
+
         .sidebar ul {
             list-style: none;
             padding: 0;
             margin: 0;
         }
+
         .sidebar ul li {
             padding: 0.8rem 1.5rem;
             cursor: pointer;
             font-size: 0.95rem;
         }
+
         .sidebar ul li:hover {
             background: #374151;
         }
+
         .sidebar ul li.active {
             background: #4f46e5;
         }
+
         .sidebar ul li a {
-            color: #fff;
-            text-decoration: none;
-            display: block;
-            width: 100%;
+            color: #fff; 
+            text-decoration: none; 
+            display: block; 
+            width: 100%; 
         }
         
         /* Main */
@@ -65,6 +72,7 @@
             margin-left: 240px;
             transition: margin-left 0.3s ease;
         }
+
         .main.expanded {
             margin-left: 0;
         }
@@ -74,57 +82,19 @@
             background: #fff;
             padding: 0.8rem 1.5rem;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;      /* center content horizontally */
             align-items: center;
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
             position: relative;
-        }
-        .menu-btn {
-            font-size: 1.5rem;
-            cursor: pointer;
-            margin-right: 1rem;
+            text-align: center;
         }
 
-        /* Profile */
-        .profile {
-            position: relative;
+        .menu-btn {
+            font-size: 1.5rem; 
             cursor: pointer;
-        }
-        .profile-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #4f46e5;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-        .dropdown {
-            position: absolute;
-            right: 0;
-            top: 48px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: none;
-            min-width: 180px;
-            z-index: 2000;
-        }
-        .dropdown.active {
-            display: block;
-        }
-        .dropdown li {
-            list-style: none;
-            padding: 0.8rem 1rem;
-            font-size: 0.95rem;
-            color: #374151;
-            cursor: pointer;
-        }
-        .dropdown li:hover {
-            background: #f3f4f6;
+            position: absolute;           /* fix it to the left */
+            left: 1.5rem;                 
+
         }
 
         /* Content area */
@@ -141,86 +111,62 @@
     </head>
     
     <body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <h2>SMA Company</h2>
-        <ul>
-        <li><a href="{{ url_for('smagraph') }}">SMA GRAPH</a></li>
-        <li class="active"><a href="{{ url_for('home') }}">Trading Algorithm</a></li>
-        <li><a href="{{ url_for('graph') }}">Streak Display</a></li>
-        <li><a href="#">Portfolio</a></li>
-        <li><a href="#">Settings</a></li>
-        </ul>
-    </div>
-
-    <!-- Main content -->
-    <div class="main" id="main">
-        <!-- Topbar -->
-        <div class="topbar">
-        <span class="menu-btn" id="menuBtn">☰</span>
-        <h3>Trading Algorithm</h3>
-        <div class="profile" id="profile">
-            <div class="profile-circle">👤</div>
-            <ul class="dropdown" id="dropdown">
-            <li>Account Management</li>
-            <li>Settings</li>
-            <li>Logout</li>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2>SMA Company</h2>
+            <ul>
+                <li><a href="{{ url_for('smagraph') }}">SMA GRAPH</a></li>
+                <li class="active"><a href="{{ url_for('home') }}">Trading Algorithm</a></li>
+                <li><a href="{{ url_for('graph') }}">Streak Display</a></li>
             </ul>
         </div>
-        </div>
-
-        <!-- Page content -->
-        <div class="content container mt-4">
-        <h1>Run Trading Algorithm</h1>
         
-        <!-- Form -->
-        <form action="/" method="post" class="card p-3">  
-            <div class="mb-3">
-            <label for="ticker" class="form-label">Stock Ticker:</label>
-            <input type="text" class="form-control" id="ticker" name="ticker" value="MSFT">
+        <!-- Main content -->
+        <div class="main" id="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <span class="menu-btn" id="menuBtn">☰</span>
+                <h3>Trading Algorithm</h3>
             </div>
-            <div class="mb-3">
-            <label for="strategy" class="form-label">Select Strategy:</label>
-            <select class="form-select" id="strategy" name="strategy">
-                <option value="default">Default Crossover</option>
-                <option value="aggressive">Aggressive</option>
-            </select>
+            
+            <!-- Page content -->
+            <div class="content container mt-4">
+                <h1>Run Trading Algorithm</h1>
+                
+                <!-- Form -->
+                <form action="/" method="post" class="card p-3">  
+                    <div class="mb-3">
+                        <label for="ticker" class="form-label">Stock Ticker:</label>
+                        <input type="text" class="form-control" id="ticker" name="ticker" value="MSFT">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="strategy" class="form-label">Select Strategy:</label>
+                        <select class="form-select" id="strategy" name="strategy">
+                            <option value="default">Default Crossover</option>
+                            <option value="aggressive">Aggressive</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Run Algorithm</button>
+                </form>
+                
+                <!-- Output -->
+                 <div class="card mt-4 p-3">
+                    <pre style="white-space: pre-wrap; font-family: inherit;">{{ advice }}</pre>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Run Algorithm</button>
-        </form>
-
-        <!-- Output -->
-        <div class="card mt-4 p-3">
-            <pre style="white-space: pre-wrap; font-family: inherit;">{{ advice }}</pre>
         </div>
-        </div>
-    </div>
+        
+        <script>
+            const menuBtn = document.getElementById('menuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const main = document.getElementById('main');
 
-    <script>
-        const menuBtn = document.getElementById('menuBtn');
-        const sidebar = document.getElementById('sidebar');
-        const main = document.getElementById('main');
-        const profile = document.getElementById('profile');
-        const dropdown = document.getElementById('dropdown');
-
-        // Sidebar toggle
-        menuBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('hidden');
-        main.classList.toggle('expanded');
-        });
-
-        // Profile dropdown toggle
-        profile.addEventListener('click', (e) => {
-        e.stopPropagation();
-        dropdown.classList.toggle('active');
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-        if (!profile.contains(e.target)) {
-            dropdown.classList.remove('active');
-        }
-        });
-    </script>
+            // Sidebar toggle
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                main.classList.toggle('expanded');
+            });
+        </script>
     </body>
 </html>

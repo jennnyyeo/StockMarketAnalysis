@@ -15,7 +15,7 @@ def bshalgorithm(data):
     q_low, q_high = 0.15, 0.85
     abs_floor = 3.0
     # ------------------ Feature From streakIdentifier.py ------------------
-    ndata = streakIdentifier(data, 20, 50).copy()
+    ndata = data
     ndata['Date'] = pd.to_datetime(ndata['Date'], errors='coerce')
     ndata['_orig_order'] = range(len(ndata))
     ndata = ndata.sort_values(
@@ -84,11 +84,6 @@ def bshalgorithm(data):
             rulesignal = 'r3sell'
         signals.append(signal)
         rulesignals.append(rulesignal)
-        if signal == 'Buy':
-            buy_dates.append(ndata['Date'].iloc[i])
-
-        elif signal == 'Sell':
-            sell_dates.append(ndata['Date'].iloc[i])
 
     ndata['Signal'] = signals
     ndata['RuleSignal'] = rulesignals
@@ -98,7 +93,7 @@ def bshalgorithm(data):
     
     maxprofitresults = max_profit_dates(ndata)
 
-    return ndata, buy_dates, sell_dates, maxprofitresults
+    return ndata, maxprofitresults
 
 
 def max_profit_dates(data):
@@ -145,9 +140,9 @@ def max_profit_dates(data):
     }
 
 
-df = pd.read_csv('MSFT.csv')
-for col in ['Close/Last', 'High', 'Low']:
-    df[col] = df[col].str.replace('$', '').astype(float)
-ndata, buy_dates, sell_dates, maxprofit = bshalgorithm(df)
-ndata.to_csv('ndata.csv', index=False)
-print(maxprofit)
+# df = pd.read_csv('MSFT.csv')
+# for col in ['Close/Last', 'High', 'Low']:
+#     df[col] = df[col].str.replace('$', '').astype(float)
+# ndata, buy_dates, sell_dates, maxprofit = bshalgorithm(df)
+# ndata.to_csv('ndata.csv', index=False)
+# print(maxprofit)
