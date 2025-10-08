@@ -95,8 +95,10 @@ def bshalgorithm(data):
 
     ndata = ndata.sort_values('_orig_order').drop(
         columns='_orig_order').reset_index(drop=True)
+    
+    maxprofitresults = max_profit_dates(ndata)
 
-    return ndata, buy_dates, sell_dates
+    return ndata, buy_dates, sell_dates, maxprofitresults
 
 
 def max_profit_dates(data):
@@ -136,8 +138,8 @@ def max_profit_dates(data):
 
     return {
         'profit': round(float(max_profit), 2),
-        'buy_date': dates.iloc[bestbuy_index].date(),
-        'sell_date': dates.iloc[bestsell_index].date(),
+        'buy_date': dates.iloc[bestbuy_index].strftime('%Y/%m/%d'),
+        'sell_date': dates.iloc[bestsell_index].strftime('%Y/%m/%d'),
         'buy_price': round(float(prices.iloc[bestbuy_index]), 2),
         'sell_price': round(float(prices.iloc[bestsell_index]), 2)
     }
@@ -146,7 +148,6 @@ def max_profit_dates(data):
 df = pd.read_csv('MSFT.csv')
 for col in ['Close/Last', 'High', 'Low']:
     df[col] = df[col].str.replace('$', '').astype(float)
-ndata, buy_dates, sell_dates = bshalgorithm(df)
+ndata, buy_dates, sell_dates, maxprofit = bshalgorithm(df)
 ndata.to_csv('ndata.csv', index=False)
-maxprofitresults = max_profit_dates(ndata)
-print(maxprofitresults)
+print(maxprofit)
