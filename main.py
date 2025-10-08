@@ -41,7 +41,7 @@ def home():
         # Generate advice
         advice_output = give_advice_text(fdata)
 
-        desired_cols = ['Date', 'Close/Last', 'SMA', 'SMA1', 'StreakIdx', 'Signal', 'RuleSignal']
+        desired_cols = ['Date', 'Close/Last', 'SMA', 'SMA1', 'StreakIdx', 'Signal']
 
         fdata['Date'] = pd.to_datetime(fdata['Date'], errors='coerce').dt.strftime("%Y/%m/%d")
         
