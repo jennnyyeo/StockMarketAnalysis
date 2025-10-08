@@ -22,21 +22,43 @@ def load_prices(ticker="MSFT"):
 
 @app.route("/", methods=["GET", "POST"])   
 def home():
-    advice_output = ""   
+    advice_output = ""  
+    table_html = None 
     
     if request.method == "POST":   
         ticker = request.form.get("ticker", "MSFT")
         strategy = request.form.get("strategy", "default")
+
         # Load prices & run algorithm
         df = load_prices(ticker)
+
         # Computing streak to update dataframe
         sdf = streakIdentifier(df)
+
         # Computing algorithm signals to update dataframe
         fdata, maxprofit = bshalgorithm(sdf)
+        
         # Generate advice
         advice_output = give_advice_text(fdata)
+
+        desired_cols = ['Date', 'Close/Last', 'SMA', 'SMA1', 'StreakIdx', 'Signal', 'RuleSignal']
+
+        fdata['Date'] = pd.to_datetime(fdata['Date'], errors='coerce').dt.strftime("%Y/%m/%d")
+        
+        try:
+            if desired_cols:
+                table_html = fdata[desired_cols].to_html(
+                    index=False,
+                    classes="table table-sm table-striped table-hover table-bordered mb-0 text-nowrap table-centered text-center",
+                    border = 0,
+                    escape=False
+                )
+        except Exception as e:
+            advice_output = f'Could not build table: {e}\nColumns in fdata: {list(fdata.columns)}'
+
+        
         fdata.to_csv('ndata.csv', index=False)
-    return render_template("index.html", advice=advice_output)  
+    return render_template("index.html", advice=advice_output, table_html=table_html) 
 
 # Route to generate SMA chart as PNG image
 @app.route("/plot.png")
