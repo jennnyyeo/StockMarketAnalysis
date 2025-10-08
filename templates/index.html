@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Trading Dashboard</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-        <style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <style>
         body {
             margin: 0;
             font-family: 'Segoe UI', Arial, sans-serif;
             background: #f5f6fa;
             display: flex;
         }
-        
+
         /* Sidebar */
         .sidebar {
             width: 240px;
@@ -58,12 +59,12 @@
         }
 
         .sidebar ul li a {
-            color: #fff; 
-            text-decoration: none; 
-            display: block; 
-            width: 100%; 
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            width: 100%;
         }
-        
+
         /* Main */
         .main {
             flex: 1;
@@ -82,18 +83,20 @@
             background: #fff;
             padding: 0.8rem 1.5rem;
             display: flex;
-            justify-content: center;      /* center content horizontally */
+            justify-content: center;
+            /* center content horizontally */
             align-items: center;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
             position: relative;
             text-align: center;
         }
 
         .menu-btn {
-            font-size: 1.5rem; 
+            font-size: 1.5rem;
             cursor: pointer;
-            position: absolute;           /* fix it to the left */
-            left: 1.5rem;                 
+            position: absolute;
+            /* fix it to the left */
+            left: 1.5rem;
 
         }
 
@@ -101,10 +104,10 @@
         .content {
             padding: 2rem;
         }
-        
+
         /* Center the header and the cells */
         .table-centered thead th,
-        .table-centered tbody td { 
+        .table-centered tbody td {
             text-align: center;
             vertical-align: middle;
         }
@@ -116,88 +119,140 @@
             background: var(--bs-body-bg, #fff);
             z-index: 1;
         }
-        
+
+        /* Colour coding for the signal */
+        .cell-buy {
+            background: #e6f4ea !important;
+            color: #0d652d !important;
+            font-weight: 600;
+        }
+
+        .cell-sell {
+            background: #fde8e7 !important;
+            color: #b3261e !important;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .main {
                 margin-left: 0;
             }
         }
-        </style>
-    </head>
-    
-    <body>
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <h2>SMA Company</h2>
-            <ul>
-                <li><a href="{{ url_for('smagraph') }}">SMA GRAPH</a></li>
-                <li class="active"><a href="{{ url_for('home') }}">Trading Algorithm</a></li>
-                <li><a href="{{ url_for('graph') }}">Streak Display</a></li>
-            </ul>
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <h2>SMA Company</h2>
+        <ul>
+            <li><a href="{{ url_for('smagraph') }}">SMA GRAPH</a></li>
+            <li class="active"><a href="{{ url_for('home') }}">Trading Algorithm</a></li>
+            <li><a href="{{ url_for('graph') }}">Streak Display</a></li>
+        </ul>
+    </div>
+
+    <!-- Main content -->
+    <div class="main" id="main">
+        <!-- Topbar -->
+        <div class="topbar">
+            <span class="menu-btn" id="menuBtn">☰</span>
+            <h3>Trading Algorithm</h3>
         </div>
-        
-        <!-- Main content -->
-        <div class="main" id="main">
-            <!-- Topbar -->
-            <div class="topbar">
-                <span class="menu-btn" id="menuBtn">☰</span>
-                <h3>Trading Algorithm</h3>
-            </div>
-            
-            <!-- Page content -->
-            <div class="content container mt-4">
-                <h1>Run Trading Algorithm</h1>
-                
-                <!-- Form -->
-                <form action="/" method="post" class="card p-3">  
-                    <div class="mb-3">
-                        <label for="ticker" class="form-label">Stock Ticker:</label>
-                        <select class="form-select" id="ticker" name="ticker" style="margin-left: 8px; padding: 5px;">
-                            <option value="MSFT">Microsoft (MSFT)</option>
-                            <option value="AMD">Advanced Micro Devices (AMD)</option>
-                            <option value="AMZN">Amazon (AMZN)</option>
-                            <option value="NFLX">Netflix (NFLX)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="strategy" class="form-label">Select Strategy:</label>
-                        <select class="form-select" id="strategy" name="strategy">
-                            <option value="default">Default Crossover</option>
-                            <option value="aggressive">Aggressive</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Run Algorithm</button>
-                </form>
-                
-                <!-- Output -->
-                 <div class="card mt-4 p-3">
-                    {% if table_html %}
-                        <div class ="table-responsive" style="max-height: 480px; overflow-y: auto;">
-                            {{ table_html|safe }}
-                        </div>
-                    {% else %}
-                        <p class="text-muted mb-0">Run the algorithm to see results.</p>
-                    {% endif %}
+
+        <!-- Page content -->
+        <div class="content container mt-4">
+            <h1>Run Trading Algorithm</h1>
+
+            <!-- Form -->
+            <form action="/" method="post" class="card p-3">
+                <div class="mb-3">
+                    <label for="ticker" class="form-label">Stock Ticker:</label>
+                    <select class="form-select" id="ticker" name="ticker" style="margin-left: 8px; padding: 5px;">
+                        <option value="MSFT">Microsoft (MSFT)</option>
+                        <option value="AMD">Advanced Micro Devices (AMD)</option>
+                        <option value="AMZN">Amazon (AMZN)</option>
+                        <option value="NFLX">Netflix (NFLX)</option>
+                    </select>
                 </div>
 
-                {% if advice %}
-                    <pre style="white-space: pre-wrap; font-family: inherit;">{{ advice }}</pre>
+                <div class="mb-3">
+                    <label for="strategy" class="form-label">Select Strategy:</label>
+                    <select class="form-select" id="strategy" name="strategy">
+                        <option value="default">Default Crossover</option>
+                        <option value="aggressive">Aggressive</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Run Algorithm</button>
+            </form>
+
+            <!-- Output -->
+            <div class="card mt-4 p-3">
+                {% if table_html %}
+                <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                    {{ table_html|safe }}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Run the algorithm to see results.</p>
                 {% endif %}
+            </div>
+
+            {% if maxprofit %}
+            <div class="card mt-3 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0">Maximum Profit</h6>
+                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                        {{ "{:,.2f}".format(maxprofit['profit']) }}
+                    </span>
+                </div>
+
+                <div class="table-responsive w-auto mx-auto">
+                    <table class="table table-sm table-bordered mb-0 text-center align-middle w-auto">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Date</th>
+                                <th>Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-success">
+                                <td class="fw-semibold">Buy</td>
+                                <td>{{ maxprofit['buy_date'] }}</td>
+                                <td>{{ "{:,.2f}".format(maxprofit['buy_price']) }}</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <td class="fw-semibold">Sell</td>
+                                <td>{{ maxprofit['sell_date'] }}</td>
+                                <td>{{ "{:,.2f}".format(maxprofit['sell_price']) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-        
-        <script>
-            const menuBtn = document.getElementById('menuBtn');
-            const sidebar = document.getElementById('sidebar');
-            const main = document.getElementById('main');
+            {% endif %}
 
-            // Sidebar toggle
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                main.classList.toggle('expanded');
-            });
-        </script>
-    </body>
+            {% if advice %}
+            <pre style="white-space: pre-wrap; font-family: inherit;">{{ advice }}</pre>
+            {% endif %}
+
+
+
+        </div>
+    </div>
+    </div>
+
+    <script>
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const main = document.getElementById('main');
+
+        // Sidebar toggle
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            main.classList.toggle('expanded');
+        });
+    </script>
+</body>
+
 </html>
