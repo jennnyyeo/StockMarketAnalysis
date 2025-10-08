@@ -47,9 +47,9 @@ def streakIdentifier(data, period, period1):
     data = data.sort_values('_orig_order').drop(columns='_orig_order').reset_index(drop=True)   
     return data
 
+if __name__ == "__main__":
+    df = pd.read_csv('MSFT.csv')
+    df['Close/Last'] = df['Close/Last'].str.replace('$', '').astype(float)
+    result = streakIdentifier(df, 20, 50)
 
-df = pd.read_csv('MSFT.csv')
-df['Close/Last'] = df['Close/Last'].str.replace('$', '').astype(float)
-result = streakIdentifier(df, 20, 50)
-
-print(result)
+    print(result)
