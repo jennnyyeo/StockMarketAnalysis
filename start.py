@@ -1,22 +1,22 @@
-import pandas
-if __name__ == "__main__":
-    data = pandas.read_csv('MSFT.csv')
+# import pandas
+# if __name__ == "__main__":
+#     data = pandas.read_csv('MSFT.csv')
 
-# Empty list to store cleaned values
-cleaned = []
+# # Empty list to store cleaned values
+# cleaned = []
 
-cleaned = [float(x[1:]) for x in data['Close/Last']]    # list comprehension
+# cleaned = [float(x[1:]) for x in data['Close/Last']]    # list comprehension
 
 
-data['Close/Last'] = cleaned
-print(data.info())
+# data['Close/Last'] = cleaned
+# print(data.info())
 
-period = input('select SMA days(must be integer):')
-if period.isdigit() and 2<=int(period)<=len(data):
-    period = int(period)
-else:
-    print('your input is invalid select 2 or more days without exceeding data series')
-    exit()
+# period = input('select SMA days(must be integer):')
+# if period.isdigit() and 2<=int(period)<=len(data):
+#     period = int(period)
+# else:
+#     print('your input is invalid select 2 or more days without exceeding data series')
+#     exit()
 
 # function annotation
 def SMA(close:float,period:int):
@@ -34,8 +34,8 @@ def SMA(close:float,period:int):
     return sma
      
 
-data['custom_SMA']=SMA(data['Close/Last'],5)    #positional argument
+# data['custom_SMA']=SMA(data['Close/Last'],5)    #positional argument
 
-# test validation
-data['test_SMA'] = data['Close/Last'].rolling(window=5).mean()
-print(data)
+# # test validation
+# data['test_SMA'] = data['Close/Last'].rolling(window=5).mean()
+# print(data)

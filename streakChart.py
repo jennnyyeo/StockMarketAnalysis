@@ -3,14 +3,16 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-from streakIdentifier import streakIdentifier, SMA
+from streakIdentifier import streakIdentifier
+
 
 CSV_FILE = "MSFT.csv"
 
-def generate_streak_chart(year=None):
+def generate_streak_chart(data, year=None):
     # Load and clean CSV
-    df = pd.read_csv(CSV_FILE)
-    df['Date'] = pd.to_datetime(df['Date'])
+    # df = pd.read_csv(CSV_FILE)
+    # df['Date'] = pd.to_datetime(df['Date'])
+    df = data
     df['Close/Last'] = df['Close/Last'].replace('[\$,]', '', regex=True).astype(float)
 
     # Sort chronologically (oldest first)

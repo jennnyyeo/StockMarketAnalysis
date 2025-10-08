@@ -4,15 +4,20 @@ from advice import give_advice_text
 # from dailyReturns import daily_returns
 from plotCharts import generate_sma_chart
 from streakChart import generate_streak_chart
+from start import SMA
 import pandas as pd
-from flask import Flask, render_template, Response, request 
+from flask import Flask, render_template, Response, request
 
 app = Flask(__name__)
 
 def load_prices(ticker="MSFT"):  
     df = pd.read_csv(f"{ticker}.csv")
+    df['Date'] = pd.to_datetime(df['Date'])
     for col in ["Close/Last", "High", "Low"]:
         df[col] = df[col].astype(str).str.lstrip("$").astype(float)
+    # Computing SMA 20 and 50 to update dataframe
+    df['SMA'] = SMA(df['Close/Last'], 20)
+    df['SMA1'] = SMA(df['Close/Last'], 50)
     return df
 
 @app.route("/", methods=["GET", "POST"])   
@@ -22,14 +27,15 @@ def home():
     if request.method == "POST":   
         ticker = request.form.get("ticker", "MSFT")
         strategy = request.form.get("strategy", "default")
-        
         # Load prices & run algorithm
         df = load_prices(ticker)
-        ndata, buy_dates, sell_dates = bshalgorithm(df)
-
+        # Computing streak to update dataframe
+        sdf = streakIdentifier(df)
+        # Computing algorithm signals to update dataframe
+        fdata, maxprofit = bshalgorithm(sdf)
         # Generate advice
-        advice_output = give_advice_text(ndata)
-
+        advice_output = give_advice_text(fdata)
+        fdata.to_csv('ndata.csv', index=False)
     return render_template("index.html", advice=advice_output)  
 
 @app.route("/plot.png")
@@ -46,7 +52,8 @@ def plot_png():
 @app.route("/streak.png")
 def streak_png():
     year = request.args.get("year", "All")  # default: all years
-    png_bytes = generate_streak_chart(year)
+    df = load_prices('MSFT')
+    png_bytes = generate_streak_chart(df, year)
     return Response(png_bytes, mimetype="image/png")
 
 @app.route('/graph')
