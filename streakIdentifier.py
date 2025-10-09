@@ -33,8 +33,8 @@ def streakIdentifier(data):
     return data
 
 if __name__ == "__main__":
-    df = pd.read_csv('MSFT.csv')
+    '''df = pd.read_csv('MSFT.csv')
     df['Close/Last'] = df['Close/Last'].str.replace('$', '').astype(float)
     result = streakIdentifier(df, 20, 50)
 
-    print(result)
+    print(result)'''

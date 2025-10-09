@@ -18,9 +18,9 @@ strings_close_open["Close/Last"] = strings_close_open["Close/Last"].astype(str)
 strings_close_open["Open"]       = strings_close_open["Open"].astype(str)
 
 # For algorithm / max profit the Close/Last, High, Low needs to be float
-algo_floats = raw.copy()
+'''algo_floats = raw.copy()
 for col in ["Close/Last", "High", "Low"]:
-    algo_floats[col] = algo_floats[col].astype(str).str.lstrip("$").astype(float)
+    algo_floats[col] = algo_floats[col].astype(str).str.lstrip("$").astype(float)'''
 
 # SMA VALIDATION using built-in rolling mean
 print("="*20 + "SMA Validation" + "="*20)
@@ -39,7 +39,13 @@ print()
 
 # StreakIdentifier VALIDATION based on SMA
 print("="*12 + "StreakIdentifier Validation (SMA Based)" + "="*12)
-ndata = streakIdentifier(close_floats.copy(), 20, 50) # from streakidentifier() function
+streakdf = close_floats.copy()
+streakdf['SMA'] = SMA(streakdf['Close/Last'], 20)
+streakdf['SMA1'] = SMA(streakdf['Close/Last'], 50)
+
+##print("Cols before call:", streakdf.columns.tolist()) i used to check the columns
+##print(streakdf[["Close/Last","SMA","SMA1"]].head(3))
+ndata = streakIdentifier(streakdf) # from streakidentifier() function
 
 # building references in chronological order
 t = ndata.sort_values("Date").reset_index(drop=True) # sorted by the date column
@@ -68,9 +74,9 @@ print(f"Validation Result (daily_returns vs (Close-Open)/Open * 100): {'PASS' if
 print(dr_out[["Date","Close/Last","Open","Daily Return (%)"]].head(12))
 print()
 
-#  Max Profit
+#  Max Profit Validation
 print("="*12 + " Max Profit (Single Trade via Signals) Validation " + "="*12)
-ndata_algo, buy_dates, sell_dates, maxprofit_result = bshalgorithm(algo_floats.copy()) # running the algo and unpacking it into 4 variables
+ndata_algo, buy_dates, sell_dates, maxprofit_result = bshalgorithm(algo_floats.copy())
 # this is for reference check 
 d = ndata_algo.copy()
 d["Date"] = pd.to_datetime(d["Date"], errors="coerce")
@@ -129,7 +135,7 @@ nan_sma_converted = pd.Series([np.nan if v is None else v for v in nan_sma])
 ok_nan = nan_sma_converted.equals(nan_ref)
 print(f"Validation Result (SMA with missing data): {'PASS' if ok_nan else 'FAIL'}")
 
-# Summary and Excel Exportation
+# Summary and Excel 
 print("\n" + "="*25 + "Summary" + "="*25)
 print(f"SMA (5/10/20): {'PASS' if ok_sma_all else 'FAIL'}")
 print(f"StreakIdentifier: {'PASS' if ok_streak else 'FAIL'}")
