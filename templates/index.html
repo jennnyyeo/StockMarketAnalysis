@@ -133,6 +133,13 @@
             font-weight: 600;
         }
 
+        /* Extra safety: hide the first column regardless of class names */
+        .table thead tr>th:first-child,
+        .table tbody tr>th:first-child,
+        .table tbody tr>td:first-child {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .main {
                 margin-left: 0;

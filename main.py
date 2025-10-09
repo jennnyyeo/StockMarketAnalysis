@@ -1,7 +1,7 @@
 from algorithm import bshalgorithm
 from streakIdentifier import streakIdentifier
 from advice import give_advice_text
-# from dailyReturns import daily_returns
+from dailyReturns import daily_returns
 from plotCharts import generate_sma_chart
 from streakChart import generate_streak_chart
 from start import SMA
@@ -33,7 +33,7 @@ def table_build(data, cols):
         )
 
     styler = (
-        df.style.hide_index().set_table_attributes(
+        df.style.set_table_attributes(
                 'class="table table-sm table-striped table-hover table-bordered mb-0 text-nowrap table-centered text-center"'
             )
             .set_td_classes(classes)
