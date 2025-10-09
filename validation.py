@@ -77,7 +77,7 @@ print()
 
 #  Max Profit Validation
 print("="*12 + " Max Profit (Single Trade via Signals) Validation " + "="*12)
-ndata_algo, buy_dates, sell_dates, maxprofit_result = bshalgorithm(ndata.copy())
+ndata_algo, maxprofit_result = bshalgorithm(ndata.copy())
 # this is for reference check 
 d = ndata_algo.copy()
 d["Date"] = pd.to_datetime(d["Date"], errors="coerce")
