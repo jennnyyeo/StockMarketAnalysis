@@ -21,6 +21,11 @@ def load_prices(ticker="MSFT"):
     df['SMA1'] = SMA(df['Close/Last'], 50)
     return df
 
+def load_priceDR(ticker='MSFT'):
+    data = pd.read_csv(f"{ticker}.csv")
+
+    return data
+
 
 def table_build(data, cols):
     df = data[cols].copy()
@@ -63,11 +68,15 @@ def home():
         # Computing algorithm signals to update dataframe
         fdata, maxprofit = bshalgorithm(sdf)
 
+        drdf = load_priceDR(ticker)
+        dailyreturns = daily_returns(drdf)
+        fdata['Daily Return (%)'] = dailyreturns['Daily Return (%)']
+
         # Generate advice
         advice_output = give_advice_text(fdata)
 
         desired_cols = ['Date', 'Close/Last',
-                        'SMA', 'SMA1', 'StreakIdx', 'Signal']
+                        'SMA', 'SMA1', 'StreakIdx', 'Signal', 'Daily Return (%)']
 
         fdata['Date'] = pd.to_datetime(
             fdata['Date'], errors='coerce').dt.strftime("%Y/%m/%d")
