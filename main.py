@@ -4,7 +4,7 @@ from advice import give_advice_text
 from dailyReturns import daily_returns
 from plotCharts import generate_sma_chart
 from streakChart import generate_streak_chart
-from start import SMA
+from smaFunc import SMA
 import pandas as pd
 from flask import Flask, render_template, Response, request
 

@@ -151,7 +151,7 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <h2>SMA Company</h2>
+        <h2>Stock Analysis</h2>
         <ul>
             <li><a href="{{ url_for('smagraph') }}">SMA GRAPH</a></li>
             <li class="active"><a href="{{ url_for('home') }}">Trading Algorithm</a></li>
@@ -184,11 +184,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="strategy" class="form-label">Select Strategy:</label>
-                    <select class="form-select" id="strategy" name="strategy">
-                        <option value="default">Default Crossover</option>
-                        <option value="aggressive">Aggressive</option>
-                    </select>
+                    <label for="strategy" class="form-label">Strategy: Default Crossover</label>
                 </div>
                 <button type="submit" class="btn btn-primary">Run Algorithm</button>
             </form>

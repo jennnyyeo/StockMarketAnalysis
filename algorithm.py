@@ -1,7 +1,5 @@
-from streakIdentifier import streakIdentifier
 import pandas as pd
 import numpy as np
-# from start import SMA
 
 
 def bshalgorithm(data):

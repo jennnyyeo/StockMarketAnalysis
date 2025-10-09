@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-from start import SMA
+from smaFunc import SMA
 
 # Default CSV file and label interval
 CSV_FILE = "MSFT.csv"

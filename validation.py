@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from start import SMA
+from smaFunc import SMA
 from dailyReturns import daily_returns
 from streakIdentifier import streakIdentifier
 from algorithm import bshalgorithm  
