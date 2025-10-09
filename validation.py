@@ -10,7 +10,8 @@ raw = pd.read_csv("MSFT.csv")
 
 # For SMA and StreakIdentifier the Close/Last needs to be float, remove the $
 close_floats = raw.copy()
-close_floats["Close/Last"] = close_floats["Close/Last"].astype(str).str.lstrip("$").astype(float)
+for col in ["Close/Last", "High", "Low"]:
+    close_floats[col] = close_floats[col].astype(str).str.lstrip("$").astype(float)
 
 # For daily_returns() needs the '$' as strings
 strings_close_open = raw.copy()
@@ -76,7 +77,7 @@ print()
 
 #  Max Profit Validation
 print("="*12 + " Max Profit (Single Trade via Signals) Validation " + "="*12)
-ndata_algo, buy_dates, sell_dates, maxprofit_result = bshalgorithm(algo_floats.copy())
+ndata_algo, buy_dates, sell_dates, maxprofit_result = bshalgorithm(ndata.copy())
 # this is for reference check 
 d = ndata_algo.copy()
 d["Date"] = pd.to_datetime(d["Date"], errors="coerce")
